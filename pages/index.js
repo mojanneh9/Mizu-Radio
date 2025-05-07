@@ -155,25 +155,28 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="flex justify-center items-center">
-                <div className="overflow-x-auto whitespace-nowrap flex space-x-6 px-4 pb-8 scrollbar-hide">
-                  {tracks.map((track, index) => (
-                    <div
-                      key={index}
-                      onClick={() => setActiveTrack(track)}
-                      className="inline-block cursor-pointer transform hover:scale-105 transition duration-300"
-                    >
-                      <img
-                        src={track.artworkUrl}
-                        alt={track.title}
-                        className="w-48 h-48 rounded-full object-cover border-4 border-blue-500 mx-auto"
-                      />
-                      <h3 className="text-lg pixel-font text-blue-300 mt-4 text-center">{track.title}</h3>
-                      <p className="text-sm text-gray-400 text-center">{track.description}</p>
-                    </div>
-                  ))}
+              {false && (
+                <div className="flex justify-center items-center">
+                  <div className="overflow-x-auto whitespace-nowrap flex space-x-6 px-4 pb-8 scrollbar-hide">
+                    {tracks.map((track, index) => (
+                      <div
+                        key={index}
+                        onClick={() => setActiveTrack(track)}
+                        className="inline-block cursor-pointer transform hover:scale-105 transition duration-300"
+                      >
+                        <img
+                          src={track.artworkUrl}
+                          alt={track.title}
+                          className="w-48 h-48 rounded-full object-cover border-4 border-blue-500 mx-auto"
+                        />
+                        <h3 className="text-lg pixel-font text-blue-300 mt-4 text-center">{track.title}</h3>
+                        <p className="text-sm text-gray-400 text-center">{track.description}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
+
             </main>
 
             <section className="mt-16">
@@ -210,15 +213,17 @@ export default function Home() {
               ) : null}
             </section>
 
-            <section className="mt-12">
-              <h2 className="text-center text-blue-400 text-xl pixel-font mb-4">Available On</h2>
-              <div className="flex justify-center gap-4 flex-wrap">
-                <a href="https://open.spotify.com/artist/your-artist-id" target="_blank" rel="noopener noreferrer" className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded pixel-font">Listen on Spotify</a>
-                <a href="https://music.apple.com/your-artist-link" target="_blank" rel="noopener noreferrer" className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded pixel-font">Listen on Apple Music</a>
-                <a href="https://tidal.com/browse/artist/your-artist-id" target="_blank" rel="noopener noreferrer" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded pixel-font">Listen on Tidal</a>
-                <a href="https://deezer.com/en/artist/your-artist-id" target="_blank" rel="noopener noreferrer" className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded pixel-font">Listen on Deezer</a>
-              </div>
-            </section>
+            {false && (
+              <section className="mt-12">
+                <h2 className="text-center text-blue-400 text-xl pixel-font mb-4">Available On</h2>
+                <div className="flex justify-center gap-4 flex-wrap">
+                  <a href="https://open.spotify.com/artist/your-artist-id" target="_blank" rel="noopener noreferrer" className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded pixel-font">Listen on Spotify</a>
+                  <a href="https://music.apple.com/your-artist-link" target="_blank" rel="noopener noreferrer" className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded pixel-font">Listen on Apple Music</a>
+                  <a href="https://tidal.com/browse/artist/your-artist-id" target="_blank" rel="noopener noreferrer" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded pixel-font">Listen on Tidal</a>
+                  <a href="https://deezer.com/en/artist/your-artist-id" target="_blank" rel="noopener noreferrer" className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded pixel-font">Listen on Deezer</a>
+                </div>
+              </section>
+            )}
           </>
         )}
 
