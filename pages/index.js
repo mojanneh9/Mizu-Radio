@@ -32,7 +32,7 @@ export default function Home() {
     if (!loading || restarting) return;
     const timer = setTimeout(() => {
       setShowStartButton(true);
-    }, 4000);
+    }, 2000);
     return () => clearTimeout(timer);
   }, [loading, restarting]);
 
@@ -111,7 +111,7 @@ export default function Home() {
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌊</text></svg>" />
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
       </Head>
-      <div className="font-sans min-h-screen bg-black text-white relative overflow-hidden">
+      <div className={`font-sans min-h-screen bg-black text-white relative overflow-hidden ${started ? 'fade-in' : ''}`}>
         <audio ref={audioRef} src="/audio/start-intro.mp3" type="audio/mpeg" preload="auto" />
         {loading && !showStartButton && !restarting && (
           <div className="fixed inset-0 flex flex-col justify-center items-center z-50 bg-black text-center">
@@ -183,9 +183,14 @@ export default function Home() {
               {activeTab === 'Tracks' || activeTab === 'All' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start px-4">
                   {[
+                    'https://soundcloud.com/mos-path/444-hertz',
+                    'https://soundcloud.com/mos-path/after-9',
+                    'https://soundcloud.com/mos-path/gmt-1',
+                    'https://soundcloud.com/mos-path/two-step',
+                    'https://soundcloud.com/mos-path/third-eye',
+                    'https://soundcloud.com/mos-path/waveearth',
                     'https://soundcloud.com/mos-path/sweet-swegbe-pathmizu',
-                    'https://soundcloud.com/mos-path/ndovo-toti-pathmizu',
-                    // Add more individual SoundCloud track URLs as needed
+                    'https://soundcloud.com/mos-path/ndovo-toti-pathmizu'
                   ].map((url, index) => (
                     <div key={index} className="bg-black border-2 border-blue-500 rounded-lg shadow-lg overflow-hidden">
                       <iframe
@@ -211,7 +216,7 @@ export default function Home() {
                       scrolling="no"
                       frameBorder="no"
                       allow="autoplay"
-                      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/mos-path/sets&color=%230066cc&auto_play=false&show_comments=false&show_user=true&show_reposts=false"
+                      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/mos-path/sets/369-ep&color=%230066cc&auto_play=false&show_comments=false&show_user=true&show_reposts=false"
                       className="w-full h-full"
                     ></iframe>
                   </div>
@@ -257,6 +262,13 @@ export default function Home() {
       </div>
 
       <style jsx global>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .fade-in {
+          animation: fadeIn 0.6s ease-in forwards;
+        }
         .pixel-font {
           font-family: 'Press Start 2P', cursive;
         }
