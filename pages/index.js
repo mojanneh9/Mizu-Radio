@@ -1,5 +1,5 @@
 // Mizu Radio – Full Startup Flow with Restart and Push-to-Start Button
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 
 const tracks = [
@@ -24,6 +24,7 @@ export default function Home() {
   const [activeTrack, setActiveTrack] = useState(null);
   const [restarting, setRestarting] = useState(false);
   const [dots, setDots] = useState('');
+  const audioRef = useRef(null);
 
   useEffect(() => {
     if (!loading || restarting) return;
@@ -36,15 +37,25 @@ export default function Home() {
   useEffect(() => {
     if (!restarting) return;
     const interval = setInterval(() => {
-      setDots(prev => prev.length >= 3 ? '' : prev + '.');
+      setDots(prev => (prev.length >= 3 ? '' : prev + '.'));
     }, 400);
     return () => clearInterval(interval);
   }, [restarting]);
 
   const handleStart = () => {
-    setLoading(false);
-    setShowStartButton(false);
-    setStarted(true);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+      audioRef.current.onended = () => {
+        setLoading(false);
+        setShowStartButton(false);
+        setStarted(true);
+      };
+    } else {
+      setLoading(false);
+      setShowStartButton(false);
+      setStarted(true);
+    }
   };
 
   const restartSite = () => {
@@ -67,6 +78,7 @@ export default function Home() {
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
       </Head>
       <div className="font-sans min-h-screen bg-black text-white relative overflow-hidden">
+        <audio ref={audioRef} src="/audio/Mizu-Radio-FX.wav" preload="auto" />
         {loading && !showStartButton && !restarting && (
           <div className="fixed inset-0 flex flex-col justify-center items-center z-50 bg-black text-center">
             <div className="absolute inset-0 bg-cover bg-center grayscale contrast-125 brightness-50 animate-pulse" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1494232410401-ad00d5431038?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)' }}></div>
