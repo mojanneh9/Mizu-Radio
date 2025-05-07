@@ -32,7 +32,7 @@ export default function Home() {
     if (!loading || restarting) return;
     const timer = setTimeout(() => {
       setShowStartButton(true);
-    }, 2000);
+    }, 1500);
     return () => clearTimeout(timer);
   }, [loading, restarting]);
 
@@ -183,14 +183,14 @@ export default function Home() {
               {activeTab === 'Tracks' || activeTab === 'All' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start px-4">
                   {[
-                    'https://soundcloud.com/mos-path/444-hertz',
-                    'https://soundcloud.com/mos-path/after-9',
-                    'https://soundcloud.com/mos-path/gmt-1',
-                    'https://soundcloud.com/mos-path/two-step',
-                    'https://soundcloud.com/mos-path/third-eye',
-                    'https://soundcloud.com/mos-path/waveearth',
-                    'https://soundcloud.com/mos-path/sweet-swegbe-pathmizu',
-                    'https://soundcloud.com/mos-path/ndovo-toti-pathmizu'
+                    'https://soundcloud.com/mos-path/forever-path-mizu',
+                    'https://soundcloud.com/mos-path/joiful-distractrions-pathmizu',
+                    'https://soundcloud.com/mos-path/sets/foundation-fm',
+                    'https://soundcloud.com/mos-path/sets/kompound-radio-the-vibe-spot',
+                    'https://soundcloud.com/mos-path/not-enough-smoke-path-mizu',
+                    'https://soundcloud.com/wearerwdy/jester',
+                    'https://soundcloud.com/mos-path/sets/mizu-radio',
+                    'https://soundcloud.com/mos-path/sets/mizu-radio-a-junior-lamb'
                   ].map((url, index) => (
                     <div key={index} className="bg-black border-2 border-blue-500 rounded-lg shadow-lg overflow-hidden">
                       <iframe
@@ -216,7 +216,7 @@ export default function Home() {
                       scrolling="no"
                       frameBorder="no"
                       allow="autoplay"
-                      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/mos-path/sets/369-ep&color=%230066cc&auto_play=false&show_comments=false&show_user=true&show_reposts=false"
+                      src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1970731944&color=%23b09b7f&auto_play=false&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true"
                       className="w-full h-full"
                     ></iframe>
                   </div>
