@@ -111,7 +111,7 @@ export default function Home() {
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
       </Head>
       <div className="font-sans min-h-screen bg-black text-white relative overflow-hidden">
-        <audio ref={audioRef} src="/audio/Mizu-Radio-FX.mp3" preload="auto" />
+        <audio ref={audioRef} src="/audio/start-intro.mp3" type="audio/mpeg" preload="auto" />
         {loading && !showStartButton && !restarting && (
           <div className="fixed inset-0 flex flex-col justify-center items-center z-50 bg-black text-center">
             <div className="absolute inset-0 bg-cover bg-center grayscale contrast-125 brightness-50 animate-pulse" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1494232410401-ad00d5431038?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)' }}></div>
