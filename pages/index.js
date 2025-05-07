@@ -25,6 +25,7 @@ export default function Home() {
   const [restarting, setRestarting] = useState(false);
   const [dots, setDots] = useState('');
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [activeTab, setActiveTab] = useState('All');
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -137,6 +138,23 @@ export default function Home() {
                 Mizu Radio
               </header>
               <h1 className="text-center text-xl md:text-3xl pixel-font text-blue-400 mb-12">SELECT A MIX</h1>
+
+              <div className="flex justify-center space-x-4 mb-6">
+                {['All', 'Tracks', 'Playlists'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-2 rounded pixel-font border-2 transition ${
+                      activeTab === tab
+                        ? 'bg-blue-600 text-white border-blue-400'
+                        : 'bg-black text-blue-400 border-blue-700 hover:bg-blue-800 hover:text-white'
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+
               <div className="flex justify-center items-center">
                 <div className="overflow-x-auto whitespace-nowrap flex space-x-6 px-4 pb-8 scrollbar-hide">
                   {tracks.map((track, index) => (
@@ -159,18 +177,33 @@ export default function Home() {
             </main>
 
             <section className="mt-16">
-              <h2 className="text-center text-blue-400 text-xl pixel-font mb-4">Stream Projects</h2>
-              <div className="flex justify-center">
-                <iframe
-                  width="100%"
-                  height="166"
-                  scrolling="no"
-                  frameBorder="no"
-                  allow="autoplay"
-                  src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/mos-path/sets/your_playlist&color=%230066cc&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true"
-                  className="w-full max-w-2xl rounded-lg"
-                ></iframe>
-              </div>
+              {activeTab === 'Tracks' || activeTab === 'All' ? (
+                <div className="flex justify-center mb-6">
+                  <iframe
+                    width="100%"
+                    height="300"
+                    scrolling="no"
+                    frameBorder="no"
+                    allow="autoplay"
+                    src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/mos-path/tracks&color=%230066cc&auto_play=false&show_comments=false&show_user=true&show_reposts=false"
+                    className="w-full max-w-2xl rounded-lg"
+                  ></iframe>
+                </div>
+              ) : null}
+
+              {activeTab === 'Playlists' || activeTab === 'All' ? (
+                <div className="flex justify-center">
+                  <iframe
+                    width="100%"
+                    height="300"
+                    scrolling="no"
+                    frameBorder="no"
+                    allow="autoplay"
+                    src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/mos-path/sets&color=%230066cc&auto_play=false&show_comments=false&show_user=true&show_reposts=false"
+                    className="w-full max-w-2xl rounded-lg"
+                  ></iframe>
+                </div>
+              ) : null}
             </section>
 
             <section className="mt-12">
