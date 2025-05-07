@@ -1,4 +1,4 @@
-// Mizu Radio – With Header, Restart Animation, and Fade-to-TV Effect
+// Mizu Radio – Full Startup Flow with Restart and Push-to-Start Button
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 
@@ -19,13 +19,17 @@ const tracks = [
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
+  const [showStartButton, setShowStartButton] = useState(false);
+  const [started, setStarted] = useState(false);
   const [activeTrack, setActiveTrack] = useState(null);
   const [restarting, setRestarting] = useState(false);
   const [dots, setDots] = useState('');
 
   useEffect(() => {
-    if (!loading && !restarting) return;
-    const timer = setTimeout(() => setLoading(false), 4000);
+    if (!loading || restarting) return;
+    const timer = setTimeout(() => {
+      setShowStartButton(true);
+    }, 4000);
     return () => clearTimeout(timer);
   }, [loading, restarting]);
 
@@ -37,11 +41,19 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [restarting]);
 
+  const handleStart = () => {
+    setLoading(false);
+    setShowStartButton(false);
+    setStarted(true);
+  };
+
   const restartSite = () => {
     setRestarting(true);
     setTimeout(() => {
       setRestarting(false);
       setLoading(true);
+      setShowStartButton(false);
+      setStarted(false);
       setActiveTrack(null);
     }, 3000);
   };
@@ -55,7 +67,7 @@ export default function Home() {
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
       </Head>
       <div className="font-sans min-h-screen bg-black text-white relative overflow-hidden">
-        {loading && !restarting && (
+        {loading && !showStartButton && !restarting && (
           <div className="fixed inset-0 flex flex-col justify-center items-center z-50 bg-black text-center">
             <div className="absolute inset-0 bg-cover bg-center grayscale contrast-125 brightness-50 animate-pulse" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1494232410401-ad00d5431038?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)' }}></div>
             <h1 className="text-4xl md:text-6xl text-blue-400 font-mono pixel-font z-10 animate-fade-loop">Mizu Radio</h1>
@@ -66,7 +78,14 @@ export default function Home() {
           </div>
         )}
 
-        {!loading && !restarting && (
+        {loading && showStartButton && !restarting && (
+          <div className="fixed inset-0 flex flex-col justify-center items-center z-50 bg-black text-center fade-in">
+            <h1 className="text-blue-400 pixel-font text-xl animate-fade-loop">Push Start</h1>
+            <button onClick={handleStart} className="mt-8 bg-blue-600 text-white pixel-font px-6 py-3 rounded animate-pulse-fast border-2 border-blue-400 hover:scale-105 transition">▶ Start</button>
+          </div>
+        )}
+
+        {started && !loading && !restarting && (
           <main className="relative z-10 px-4 py-12 md:px-12">
             <header className="text-center text-blue-400 text-2xl pixel-font cursor-pointer mb-8" onClick={restartSite}>
               Mizu Radio
@@ -102,7 +121,7 @@ export default function Home() {
             <div className="w-full h-full flex items-center justify-center">
               <div className="w-full h-1 bg-white animate-tv-shut" />
             </div>
-            <p className="text-blue-400 pixel-font mt-6 text-xl">restarting{dots}</p>
+            <p className="text-blue-400 pixel-font text-xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">restarting{dots}</p>
           </div>
         )}
       </div>
@@ -132,6 +151,13 @@ export default function Home() {
         }
         .animate-tv-shut {
           animation: tv-shut 0.6s ease-out forwards;
+        }
+        @keyframes pulse-fast {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+        .animate-pulse-fast {
+          animation: pulse-fast 0.8s ease-in-out infinite;
         }
       `}</style>
     </>
