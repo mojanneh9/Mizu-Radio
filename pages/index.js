@@ -136,14 +136,24 @@ export default function Home() {
               Mizu Radio
             </header>
             <h1 className="text-center text-xl md:text-3xl pixel-font text-blue-400 mb-12">SELECT A MIX</h1>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-              {tracks.map((track, index) => (
-                <div key={index} onClick={() => setActiveTrack(track)} className="cursor-pointer bg-gray-900 p-4 rounded-lg border border-blue-800 hover:border-blue-400 hover:scale-[1.02] transform transition duration-300">
-                  <img src={track.artworkUrl} alt={track.title} className="rounded-full w-full aspect-square object-cover mb-4" />
-                  <h3 className="text-lg pixel-font text-blue-300 mb-2">{track.title}</h3>
-                  <p className="text-sm text-gray-400">{track.description}</p>
-                </div>
-              ))}
+            <div className="flex justify-center items-center">
+              <div className="overflow-x-auto whitespace-nowrap flex space-x-6 px-4 pb-8 scrollbar-hide">
+                {tracks.map((track, index) => (
+                  <div
+                    key={index}
+                    onClick={() => setActiveTrack(track)}
+                    className="inline-block cursor-pointer transform hover:scale-105 transition duration-300"
+                  >
+                    <img
+                      src={track.artworkUrl}
+                      alt={track.title}
+                      className="w-48 h-48 rounded-full object-cover border-4 border-blue-500 mx-auto"
+                    />
+                    <h3 className="text-lg pixel-font text-blue-300 mt-4 text-center">{track.title}</h3>
+                    <p className="text-sm text-gray-400 text-center">{track.description}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </main>
         )}
@@ -210,6 +220,13 @@ export default function Home() {
         }
         .fade-out {
           animation: fadeOut 0.5s ease-out forwards;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
     </>
