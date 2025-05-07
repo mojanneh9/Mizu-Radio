@@ -179,29 +179,33 @@ export default function Home() {
             <section className="mt-16">
               {activeTab === 'Tracks' || activeTab === 'All' ? (
                 <div className="flex justify-center mb-6">
-                  <iframe
-                    width="100%"
-                    height="300"
-                    scrolling="no"
-                    frameBorder="no"
-                    allow="autoplay"
-                    src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/mos-path/tracks&color=%230066cc&auto_play=false&show_comments=false&show_user=true&show_reposts=false"
-                    className="w-full max-w-2xl rounded-lg"
-                  ></iframe>
+                  <div className="w-full max-w-2xl border-2 border-blue-500 rounded-lg shadow-lg overflow-hidden">
+                    <iframe
+                      width="100%"
+                      height="300"
+                      scrolling="no"
+                      frameBorder="no"
+                      allow="autoplay"
+                      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/mos-path/tracks&color=%230066cc&auto_play=false&show_comments=false&show_user=true&show_reposts=false"
+                      className="w-full h-full"
+                    ></iframe>
+                  </div>
                 </div>
               ) : null}
 
               {activeTab === 'Playlists' || activeTab === 'All' ? (
                 <div className="flex justify-center">
-                  <iframe
-                    width="100%"
-                    height="300"
-                    scrolling="no"
-                    frameBorder="no"
-                    allow="autoplay"
-                    src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/mos-path/sets&color=%230066cc&auto_play=false&show_comments=false&show_user=true&show_reposts=false"
-                    className="w-full max-w-2xl rounded-lg"
-                  ></iframe>
+                  <div className="w-full max-w-2xl border-2 border-blue-500 rounded-lg shadow-lg overflow-hidden">
+                    <iframe
+                      width="100%"
+                      height="300"
+                      scrolling="no"
+                      frameBorder="no"
+                      allow="autoplay"
+                      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/mos-path/sets&color=%230066cc&auto_play=false&show_comments=false&show_user=true&show_reposts=false"
+                      className="w-full h-full"
+                    ></iframe>
+                  </div>
                 </div>
               ) : null}
             </section>
