@@ -6,13 +6,13 @@ const tracks = [
   {
     title: 'Sweet Swegbe (Path.Mizu)',
     artworkUrl: 'https://via.placeholder.com/300x300.png?text=Sweet+Swegbe',
-    audioUrl: '/music/Sweet Swegbe (Path.Mizu).wav',
+    audioUrl: '/music/Sweet Swegbe (Path.Mizu).mp3',
     description: 'A meditative groove rooted in spirit and swing.'
   },
   {
     title: 'Ndovo Toti (Path.Mizu)',
     artworkUrl: 'https://via.placeholder.com/300x300.png?text=Ndovo+Toti',
-    audioUrl: '/music/Ndovo Toti (Path.Mizu).wav',
+    audioUrl: '/music/Ndovo Toti (Path.Mizu).mp3',
     description: 'An Afro-sonic journey into emotion and ritual.'
   }
 ];
@@ -24,6 +24,7 @@ export default function Home() {
   const [activeTrack, setActiveTrack] = useState(null);
   const [restarting, setRestarting] = useState(false);
   const [dots, setDots] = useState('');
+  const [isFadingOut, setIsFadingOut] = useState(false);
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function Home() {
   }, [restarting]);
 
   const handleStart = () => {
+    setIsFadingOut(true);
     if (audioRef.current) {
       try {
         audioRef.current.currentTime = 0;
@@ -51,29 +53,41 @@ export default function Home() {
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
-              audioRef.current.onended = () => {
-                setLoading(false);
-                setShowStartButton(false);
-                setStarted(true);
-              };
+              setTimeout(() => {
+                audioRef.current.onended = () => {
+                  setLoading(false);
+                  setShowStartButton(false);
+                  setStarted(true);
+                  setIsFadingOut(false);
+                };
+              }, 500);
             })
             .catch((error) => {
               console.error('Audio play error:', error);
-              setLoading(false);
-              setShowStartButton(false);
-              setStarted(true);
+              setTimeout(() => {
+                setLoading(false);
+                setShowStartButton(false);
+                setStarted(true);
+                setIsFadingOut(false);
+              }, 500);
             });
         }
       } catch (err) {
         console.error('Playback error:', err);
+        setTimeout(() => {
+          setLoading(false);
+          setShowStartButton(false);
+          setStarted(true);
+          setIsFadingOut(false);
+        }, 500);
+      }
+    } else {
+      setTimeout(() => {
         setLoading(false);
         setShowStartButton(false);
         setStarted(true);
-      }
-    } else {
-      setLoading(false);
-      setShowStartButton(false);
-      setStarted(true);
+        setIsFadingOut(false);
+      }, 500);
     }
   };
 
@@ -97,7 +111,7 @@ export default function Home() {
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
       </Head>
       <div className="font-sans min-h-screen bg-black text-white relative overflow-hidden">
-        <audio ref={audioRef} src="/audio/Mizu-Radio-FX.wav" preload="auto" />
+        <audio ref={audioRef} src="/audio/Mizu-Radio-FX.mp3" preload="auto" />
         {loading && !showStartButton && !restarting && (
           <div className="fixed inset-0 flex flex-col justify-center items-center z-50 bg-black text-center">
             <div className="absolute inset-0 bg-cover bg-center grayscale contrast-125 brightness-50 animate-pulse" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1494232410401-ad00d5431038?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)' }}></div>
@@ -110,9 +124,9 @@ export default function Home() {
         )}
 
         {loading && showStartButton && !restarting && (
-          <div className="fixed inset-0 flex flex-col justify-center items-center z-50 bg-black text-center fade-in">
+          <div className={`fixed inset-0 flex flex-col justify-center items-center z-50 bg-black text-center fade-in ${isFadingOut ? 'fade-out' : ''}`}>
             <h1 className="text-blue-400 pixel-font text-xl animate-fade-loop">Push Start</h1>
-            <button onClick={handleStart} className="mt-8 bg-blue-600 text-white pixel-font px-6 py-3 rounded animate-pulse-fast border-2 border-blue-400 hover:scale-105 transition">▶ Start</button>
+            <button onClick={handleStart} className={`mt-8 bg-blue-600 text-white pixel-font px-6 py-3 rounded animate-pulse-fast border-2 border-blue-400 hover:scale-105 transition${isFadingOut ? ' fade-out' : ''}`}>▶ Start</button>
           </div>
         )}
 
@@ -189,6 +203,13 @@ export default function Home() {
         }
         .animate-pulse-fast {
           animation: pulse-fast 0.8s ease-in-out infinite;
+        }
+        @keyframes fadeOut {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+        .fade-out {
+          animation: fadeOut 0.5s ease-out forwards;
         }
       `}</style>
     </>
