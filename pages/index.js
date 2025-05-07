@@ -44,13 +44,32 @@ export default function Home() {
 
   const handleStart = () => {
     if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
-      audioRef.current.onended = () => {
+      try {
+        audioRef.current.currentTime = 0;
+        const playPromise = audioRef.current.play();
+
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              audioRef.current.onended = () => {
+                setLoading(false);
+                setShowStartButton(false);
+                setStarted(true);
+              };
+            })
+            .catch((error) => {
+              console.error('Audio play error:', error);
+              setLoading(false);
+              setShowStartButton(false);
+              setStarted(true);
+            });
+        }
+      } catch (err) {
+        console.error('Playback error:', err);
         setLoading(false);
         setShowStartButton(false);
         setStarted(true);
-      };
+      }
     } else {
       setLoading(false);
       setShowStartButton(false);
