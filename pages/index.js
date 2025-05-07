@@ -137,7 +137,7 @@ export default function Home() {
               <header className="text-center text-blue-400 text-2xl pixel-font cursor-pointer mb-8" onClick={restartSite}>
                 Mizu Radio
               </header>
-              <h1 className="text-center text-xl md:text-3xl pixel-font text-blue-400 mb-12">SELECT A MIX</h1>
+              <h1 className="text-center text-xl md:text-3xl pixel-font text-blue-400 mb-12">CHOOSE YOUR VIBE</h1>
 
               <div className="flex justify-center space-x-4 mb-6">
                 {['All', 'Tracks', 'Playlists'].map((tab) => (
