@@ -6,13 +6,13 @@ const tracks = [
   {
     title: 'Sweet Swegbe (Path.Mizu)',
     artworkUrl: 'https://via.placeholder.com/300x300.png?text=Sweet+Swegbe',
-    audioUrl: '/music/sweet-swegbe.mp3',
+    audioUrl: '/music/Sweet Swegbe (Path.Mizu).wav',
     description: 'A meditative groove rooted in spirit and swing.'
   },
   {
     title: 'Ndovo Toti (Path.Mizu)',
     artworkUrl: 'https://via.placeholder.com/300x300.png?text=Ndovo+Toti',
-    audioUrl: '/music/ndovo-toti.mp3',
+    audioUrl: '/music/Ndovo Toti (Path.Mizu).wav',
     description: 'An Afro-sonic journey into emotion and ritual.'
   }
 ];
