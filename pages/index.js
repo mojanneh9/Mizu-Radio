@@ -198,14 +198,24 @@ export default function Home() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start px-4">
                     {[
+                      'https://soundcloud.com/mos-path/5d-earth-ft-sharheem?in=mos-path/sets/369-ep',
+                      'https://soundcloud.com/mos-path/thirdeye-ft-sharheem?in=mos-path/sets/369-ep',
+                      'https://soundcloud.com/mos-path/2-step-ft-sharheem?in=mos-path/sets/369-ep',
                       'https://soundcloud.com/mos-path/forever-path-mizu',
-                      'https://soundcloud.com/mos-path/joiful-distractrions-pathmizu',
+                      'https://soundcloud.com/mos-path/joiful-distractions-pathmizu',
+                      'https://soundcloud.com/mos-path/caudillo',
+                      'https://soundcloud.com/mos-path/ndovo-toti-path-mizu',
+                      'https://soundcloud.com/mos-path/sweet-swegbe-path-mizu',
+                      'https://soundcloud.com/mos-path/im-2-swift-path-mizu',
+                      'https://soundcloud.com/mos-path/not-enough-smoke-path-mizu',
+                      'https://soundcloud.com/mos-path/piece-of-peace-oat-milk',
                       'https://soundcloud.com/mos-path/sets/foundation-fm',
                       'https://soundcloud.com/mos-path/sets/kompound-radio-the-vibe-spot',
-                      'https://soundcloud.com/mos-path/not-enough-smoke-path-mizu',
+                      'https://soundcloud.com/mos-path/eureka',
                       'https://soundcloud.com/wearerwdy/jester',
                       'https://soundcloud.com/mos-path/sets/mizu-radio',
-                      'https://soundcloud.com/mos-path/sets/mizu-radio-a-junior-lamb'
+                      'https://soundcloud.com/mos-path/mizu-radio-005-back-home-tourist?in=mos-path/sets/mizu-radio',
+                      'https://soundcloud.com/mos-path/bae-told-them-ft-davecreates?in=mos-path/sets/bae-told-them-single'
                     ].map((url, index) => (
                       <div key={index} className="bg-black border-2 border-blue-500 rounded-lg shadow-lg overflow-hidden p-4">
                         <div className="pixel-font text-blue-300 font-bold mb-2">Now Playing</div>
