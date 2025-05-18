@@ -140,7 +140,11 @@ export default function Home() {
                     <img src={track.artwork_url || 'https://via.placeholder.com/100'} alt={track.title} className="w-16 h-16 rounded-full" />
                     <div className="flex-1">
                       <h2 className="text-blue-300 pixel-font text-sm">{track.title}</h2>
-                      <audio controls src={`${track.stream_url}?client_id=${process.env.NEXT_PUBLIC_SOUNDCLOUD_CLIENT_ID}`} className="w-full mt-2" />
+                      <audio
+                      controls
+                      src={`/api/stream?trackUrl=${encodeURIComponent(track.stream_url)}`}
+                      className="w-full mt-2"
+                        />
                     </div>
                   </div>
                 </div>
