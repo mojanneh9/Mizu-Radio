@@ -193,11 +193,9 @@ export default function Home() {
                     <div className="flex-1">
                       <h2 className="text-blue-300 pixel-font text-sm">{track.title}</h2>
                       <audio
-                        controls
-                        src={`/api/stream?trackUrl=${encodeURIComponent(
-                          `https://api.soundcloud.com/tracks/${track.id}`
-                        )}`}
-                        className="w-full mt-2"
+                      controls
+                      src={track.stream_url}
+                      className="w-full mt-2"
                       />
                     </div>
                   </div>
