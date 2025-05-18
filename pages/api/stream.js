@@ -25,22 +25,22 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Unable to authenticate with SoundCloud' });
       }
   
-      // Stream the audio file using the OAuth token
-      const streamRes = await fetch(`${trackUrl}`, {
+      // Fetch stream using OAuth header
+      const streamRes = await fetch(trackUrl, {
         headers: {
           Authorization: `OAuth ${accessToken}`,
         },
       });
   
       if (!streamRes.ok) {
-        return res.status(streamRes.status).end();
+        return res.status(streamRes.status).json({ error: 'Failed to fetch stream' });
       }
   
-      // Pipe the stream directly to the client
+      // Stream directly to client
       res.setHeader('Content-Type', 'audio/mpeg');
       streamRes.body.pipe(res);
     } catch (err) {
-      console.error('Stream error:', err);
-      res.status(500).json({ error: 'Error streaming track' });
+      console.error('Streaming error:', err);
+      res.status(500).json({ error: 'Error fetching stream from SoundCloud' });
     }
   }
