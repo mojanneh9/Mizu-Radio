@@ -1,4 +1,4 @@
-import { redis } from '../../lib/redis';
+import { redis } from '@/lib/redis';
 
 let accessTokenCache = {
   token: null,
@@ -7,21 +7,19 @@ let accessTokenCache = {
 
 export default async function handler(req, res) {
   const { SC_CLIENT_ID, SC_CLIENT_SECRET } = process.env;
-  const cacheKey = 'soundcloud:tracks';
 
   if (!SC_CLIENT_ID || !SC_CLIENT_SECRET) {
     return res.status(500).json({ error: 'Missing SoundCloud API credentials' });
   }
 
   try {
-    // ✅ Try cached result from Upstash Redis
-    const cachedTracks = await redis.get(cacheKey);
+    // ✅ Try cache first
+    const cachedTracks = await redis.get('soundcloud_tracks');
     if (cachedTracks) {
-      console.log('✅ Using cached SoundCloud data');
       return res.status(200).json(cachedTracks);
     }
 
-    // ✅ Refresh token if expired or missing
+    // ✅ Use cached token if valid
     const now = Date.now();
     if (!accessTokenCache.token || accessTokenCache.expiresAt < now) {
       const tokenRes = await fetch('https://api.soundcloud.com/oauth2/token', {
@@ -46,7 +44,7 @@ export default async function handler(req, res) {
     }
 
     const accessToken = accessTokenCache.token;
-    const userId = '52603176';
+    const userId = '52603176'; // hardcoded after manual lookup
 
     const tracksRes = await fetch(`https://api.soundcloud.com/users/${userId}/tracks`, {
       headers: {
@@ -68,8 +66,8 @@ export default async function handler(req, res) {
       stream_url: track.stream_url,
     }));
 
-    // ✅ Store in Redis cache for 1 hour
-    await redis.set(cacheKey, simplified, { ex: 3600 });
+    // ✅ Store in Redis for 1 hour
+    await redis.set('soundcloud_tracks', simplified, { ex: 3600 });
 
     return res.status(200).json(simplified);
   } catch (err) {

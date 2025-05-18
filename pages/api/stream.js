@@ -1,6 +1,9 @@
-// pages/api/stream.js
-
-export default async function handler(req, res) {
+let accessTokenCache = {
+    token: null,
+    expiresAt: null,
+  };
+  
+  export default async function handler(req, res) {
     const { SC_CLIENT_ID, SC_CLIENT_SECRET } = process.env;
     const { trackUrl } = req.query;
   
@@ -9,66 +12,71 @@ export default async function handler(req, res) {
     }
   
     try {
-      // 1. Get OAuth token
-      const tokenRes = await fetch('https://api.soundcloud.com/oauth2/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_id: SC_CLIENT_ID,
-          client_secret: SC_CLIENT_SECRET,
-          grant_type: 'client_credentials',
-        }),
-      });
+      const now = Date.now();
   
-      const tokenData = await tokenRes.json();
-      const accessToken = tokenData.access_token;
+      // ✅ Use cached token if valid
+      if (!accessTokenCache.token || accessTokenCache.expiresAt < now) {
+        const tokenRes = await fetch('https://api.soundcloud.com/oauth2/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            client_id: SC_CLIENT_ID,
+            client_secret: SC_CLIENT_SECRET,
+            grant_type: 'client_credentials',
+          }),
+        });
   
-      if (!accessToken) {
-        return res.status(401).json({ error: 'Unable to authenticate with SoundCloud' });
+        const tokenData = await tokenRes.json();
+  
+        if (!tokenData.access_token) {
+          console.error('❌ Failed to get access token:', tokenData);
+          return res.status(429).json({ error: 'Rate limited or failed to authenticate with SoundCloud' });
+        }
+  
+        accessTokenCache.token = tokenData.access_token;
+        accessTokenCache.expiresAt = now + tokenData.expires_in * 1000;
       }
   
-      // 2. Fetch the full track metadata using the `trackUrl`
-      const trackRes = await fetch(trackUrl, {
-        headers: {
-          Authorization: `OAuth ${accessToken}`,
-        },
+      const accessToken = accessTokenCache.token;
+  
+      // Step 2: Fetch metadata for the track
+      const metadataRes = await fetch(trackUrl, {
+        headers: { Authorization: `OAuth ${accessToken}` },
       });
   
-      if (!trackRes.ok) {
-        return res.status(trackRes.status).json({ error: 'Failed to fetch track metadata' });
+      if (!metadataRes.ok) {
+        return res.status(metadataRes.status).json({ error: 'Failed to fetch track metadata' });
       }
   
-      const trackData = await trackRes.json();
+      const trackData = await metadataRes.json();
   
-      // 3. Find the MP3 progressive stream URL
-      const mp3Stream = trackData?.media?.transcodings?.find(t => t.format.protocol === 'progressive');
+      const mp3Stream = trackData?.media?.transcodings?.find(
+        (t) => t.format.protocol === 'progressive'
+      );
   
       if (!mp3Stream) {
         return res.status(404).json({ error: 'MP3 stream not found for this track' });
       }
   
-      const streamResolveRes = await fetch(`${mp3Stream.url}?client_id=${SC_CLIENT_ID}`, {
-        headers: {
-          Authorization: `OAuth ${accessToken}`,
-        },
+      const streamRes = await fetch(`${mp3Stream.url}?client_id=${SC_CLIENT_ID}`, {
+        headers: { Authorization: `OAuth ${accessToken}` },
       });
   
-      const streamResolveData = await streamResolveRes.json();
-      const finalStreamUrl = streamResolveData?.url;
+      const streamData = await streamRes.json();
+      const finalStreamUrl = streamData?.url;
   
       if (!finalStreamUrl) {
         return res.status(500).json({ error: 'Could not resolve final stream URL' });
       }
   
-      // 4. Pipe the final MP3 stream to the browser
-      const finalStreamRes = await fetch(finalStreamUrl);
+      const audioStreamRes = await fetch(finalStreamUrl);
   
-      if (!finalStreamRes.ok || !finalStreamRes.body) {
-        return res.status(finalStreamRes.status).json({ error: 'Error streaming audio' });
+      if (!audioStreamRes.ok || !audioStreamRes.body) {
+        return res.status(audioStreamRes.status).json({ error: 'Error streaming audio' });
       }
   
       res.setHeader('Content-Type', 'audio/mpeg');
-      finalStreamRes.body.pipe(res);
+      audioStreamRes.body.pipe(res);
     } catch (err) {
       console.error('Streaming error:', err);
       res.status(500).json({ error: 'Error streaming from SoundCloud' });
