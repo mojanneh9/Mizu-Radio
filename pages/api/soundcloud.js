@@ -1,7 +1,13 @@
-// pages/api/soundcloud.js
-
 export default async function handler(req, res) {
     const { SC_CLIENT_ID, SC_CLIENT_SECRET } = process.env;
+  
+    // ✅ Log values at top for debugging on Vercel
+    console.log("SC_CLIENT_ID:", SC_CLIENT_ID);
+    console.log("SC_CLIENT_SECRET:", SC_CLIENT_SECRET?.slice(0, 4) + '...'); // hide rest
+  
+    if (!SC_CLIENT_ID || !SC_CLIENT_SECRET) {
+      return res.status(500).json({ error: 'Missing SoundCloud API credentials' });
+    }
   
     try {
       // 1. Get OAuth token
@@ -23,7 +29,7 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Failed to authenticate with SoundCloud' });
       }
   
-      // 2. Fetch user profile via resolve
+      // 2. Resolve the user
       const profileRes = await fetch(
         'https://api.soundcloud.com/resolve?url=https://soundcloud.com/mos-path',
         {
@@ -57,12 +63,12 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Unexpected track data format from SoundCloud' });
       }
   
-      // 4. Return only needed fields (optional: helps reduce frontend size)
+      // 4. Return simplified data
       const simplified = tracks.map((track) => ({
         id: track.id,
         title: track.title,
         artwork_url: track.artwork_url,
-        stream_url: track.stream_url, // we'll use this to proxy
+        stream_url: track.stream_url, // used for proxy streaming
       }));
   
       return res.status(200).json(simplified);
