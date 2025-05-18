@@ -1,9 +1,9 @@
 export default async function handler(req, res) {
     const { SC_CLIENT_ID, SC_CLIENT_SECRET } = process.env;
   
-    // ✅ Log values at top for debugging on Vercel
-    console.log("SC_CLIENT_ID:", SC_CLIENT_ID);
-    console.log("SC_CLIENT_SECRET:", SC_CLIENT_SECRET?.slice(0, 4) + '...'); // hide rest
+    // ✅ Log credentials presence (not full values)
+    console.log('[ENV] SC_CLIENT_ID:', SC_CLIENT_ID ? '✅ Present' : '❌ Missing');
+    console.log('[ENV] SC_CLIENT_SECRET:', SC_CLIENT_SECRET ? '✅ Present' : '❌ Missing');
   
     if (!SC_CLIENT_ID || !SC_CLIENT_SECRET) {
       return res.status(500).json({ error: 'Missing SoundCloud API credentials' });
@@ -22,10 +22,11 @@ export default async function handler(req, res) {
       });
   
       const tokenData = await tokenResponse.json();
-      const accessToken = tokenData.access_token;
+      console.log('[DEBUG] Token response:', tokenData);
   
+      const accessToken = tokenData.access_token;
       if (!accessToken) {
-        console.error('❌ No access token:', tokenData);
+        console.error('❌ No access token returned from SoundCloud');
         return res.status(401).json({ error: 'Failed to authenticate with SoundCloud' });
       }
   
@@ -40,9 +41,9 @@ export default async function handler(req, res) {
       );
   
       const user = await profileRes.json();
+      console.log('[DEBUG] Resolved user:', user);
   
       if (!user.id) {
-        console.error('❌ Could not resolve user:', user);
         return res.status(404).json({ error: 'User not found on SoundCloud' });
       }
   
@@ -57,18 +58,17 @@ export default async function handler(req, res) {
       );
   
       const tracks = await tracksRes.json();
+      console.log('[DEBUG] Fetched tracks:', Array.isArray(tracks) ? `${tracks.length} found` : tracks);
   
       if (!Array.isArray(tracks)) {
-        console.error('❌ Unexpected response from track API:', tracks);
         return res.status(500).json({ error: 'Unexpected track data format from SoundCloud' });
       }
   
-      // 4. Return simplified data
       const simplified = tracks.map((track) => ({
         id: track.id,
         title: track.title,
         artwork_url: track.artwork_url,
-        stream_url: track.stream_url, // used for proxy streaming
+        stream_url: track.stream_url,
       }));
   
       return res.status(200).json(simplified);
