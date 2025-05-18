@@ -1,27 +1,25 @@
-import { redis } from '@/lib/redis';
-
-let accessTokenCache = {
-  token: null,
-  expiresAt: null,
-};
+import { redis } from '../../lib/redis';
 
 export default async function handler(req, res) {
   const { SC_CLIENT_ID, SC_CLIENT_SECRET } = process.env;
+  const userId = '52603176';
 
   if (!SC_CLIENT_ID || !SC_CLIENT_SECRET) {
-    return res.status(500).json({ error: 'Missing SoundCloud API credentials' });
+    return res.status(500).json({ error: 'Missing SoundCloud credentials' });
   }
 
   try {
-    // ✅ Try cache first
-    const cachedTracks = await redis.get('soundcloud_tracks');
-    if (cachedTracks) {
-      return res.status(200).json(cachedTracks);
-    }
-
-    // ✅ Use cached token if valid
+    let accessToken = await redis.get('sc_token');
+    const expiresAt = await redis.get('sc_token_expiry');
     const now = Date.now();
-    if (!accessTokenCache.token || accessTokenCache.expiresAt < now) {
+
+    console.log('[Redis] Cached token:', accessToken ? '✅' : '❌');
+    console.log('[Redis] Token expiry:', expiresAt);
+    console.log('[Now]', now);
+
+    if (!accessToken || now > Number(expiresAt)) {
+      console.log('[Redis] Token expired or missing. Fetching new token...');
+
       const tokenRes = await fetch('https://api.soundcloud.com/oauth2/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -36,23 +34,32 @@ export default async function handler(req, res) {
 
       if (!tokenData.access_token) {
         console.error('❌ No access token:', tokenData);
-        return res.status(429).json({ error: 'Rate limited by SoundCloud' });
-      }
 
-      accessTokenCache.token = tokenData.access_token;
-      accessTokenCache.expiresAt = now + tokenData.expires_in * 1000;
+        // Fallback: try to use expired token if it exists
+        const fallbackToken = await redis.get('sc_token');
+        if (fallbackToken) {
+          console.warn('⚠️ Using possibly expired token as fallback.');
+          accessToken = fallbackToken;
+        } else {
+          return res.status(429).json({ error: 'Rate limited by SoundCloud and no cached token available' });
+        }
+      } else {
+        accessToken = tokenData.access_token;
+        await redis.set('sc_token', accessToken);
+        await redis.set('sc_token_expiry', now + tokenData.expires_in * 1000);
+        console.log('[Redis] Token saved to Redis');
+      }
+    } else {
+      console.log('[Redis] Using cached token');
     }
 
-    const accessToken = accessTokenCache.token;
-    const userId = '52603176'; // hardcoded after manual lookup
-
-    const tracksRes = await fetch(`https://api.soundcloud.com/users/${userId}/tracks`, {
+    const trackRes = await fetch(`https://api.soundcloud.com/users/${userId}/tracks`, {
       headers: {
         Authorization: `OAuth ${accessToken}`,
       },
     });
 
-    const tracks = await tracksRes.json();
+    const tracks = await trackRes.json();
 
     if (!Array.isArray(tracks)) {
       console.error('❌ Unexpected tracks format:', tracks);
@@ -65,9 +72,6 @@ export default async function handler(req, res) {
       artwork_url: track.artwork_url,
       stream_url: track.stream_url,
     }));
-
-    // ✅ Store in Redis for 1 hour
-    await redis.set('soundcloud_tracks', simplified, { ex: 3600 });
 
     return res.status(200).json(simplified);
   } catch (err) {
