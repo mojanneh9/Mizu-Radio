@@ -18,13 +18,28 @@ export default function Home() {
 
   useEffect(() => {
     const fetchTracks = async () => {
-      const resolveUrl = `https://api.soundcloud.com/resolve?url=https://soundcloud.com/mos-path&client_id=${CLIENT_ID}`;
-      const res = await fetch(resolveUrl);
-      const user = await res.json();
-      const trackUrl = `https://api.soundcloud.com/users/${user.id}/tracks?client_id=${CLIENT_ID}`;
-      const trackRes = await fetch(trackUrl);
-      const trackData = await trackRes.json();
-      setTracks(trackData);
+      try {
+        const resolveUrl = `https://api.soundcloud.com/resolve?url=https://soundcloud.com/mos-path&client_id=${CLIENT_ID}`;
+        const res = await fetch(resolveUrl);
+        const user = await res.json();
+
+        if (!user || !user.id) {
+          console.error("Failed to resolve user", user);
+          return;
+        }
+
+        const trackUrl = `https://api.soundcloud.com/users/${user.id}/tracks?client_id=${CLIENT_ID}`;
+        const trackRes = await fetch(trackUrl);
+        const trackData = await trackRes.json();
+
+        if (Array.isArray(trackData)) {
+          setTracks(trackData);
+        } else {
+          console.error("Unexpected track response", trackData);
+        }
+      } catch (err) {
+        console.error("Error fetching SoundCloud tracks:", err);
+      }
     };
 
     fetchTracks();
