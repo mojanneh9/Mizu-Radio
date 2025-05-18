@@ -2,8 +2,6 @@
 import { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 
-const CLIENT_ID = 'ZwLH1slfY3CZI1lgCuh5WpZcFlmzjN9c';
-
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showStartButton, setShowStartButton] = useState(false);
@@ -19,26 +17,11 @@ export default function Home() {
   useEffect(() => {
     const fetchTracks = async () => {
       try {
-        const resolveUrl = `https://api.soundcloud.com/resolve?url=https://soundcloud.com/mos-path&client_id=${CLIENT_ID}`;
-        const res = await fetch(resolveUrl);
-        const user = await res.json();
-
-        if (!user || !user.id) {
-          console.error("Failed to resolve user", user);
-          return;
-        }
-
-        const trackUrl = `https://api.soundcloud.com/users/${user.id}/tracks?client_id=${CLIENT_ID}`;
-        const trackRes = await fetch(trackUrl);
-        const trackData = await trackRes.json();
-
-        if (Array.isArray(trackData)) {
-          setTracks(trackData);
-        } else {
-          console.error("Unexpected track response", trackData);
-        }
-      } catch (err) {
-        console.error("Error fetching SoundCloud tracks:", err);
+        const res = await fetch('/api/soundcloud');
+        const data = await res.json();
+        setTracks(data);
+      } catch (error) {
+        console.error('Error fetching tracks:', error);
       }
     };
 
@@ -147,6 +130,8 @@ export default function Home() {
             <header className="text-center text-blue-400 text-2xl pixel-font cursor-pointer mb-8" onClick={restartSite}>Mizu Radio</header>
             <h1 className="text-center text-xl md:text-3xl pixel-font text-blue-400 mb-12">CHOOSE YOUR VIBE</h1>
 
+            {tracks.length === 0 && <p className="text-center text-gray-500 pixel-font">No tracks available</p>}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start px-4">
               {tracks.map((track) => (
                 <div key={track.id} className="bg-black border-2 border-blue-500 rounded-lg shadow-lg overflow-hidden p-4">
@@ -155,7 +140,7 @@ export default function Home() {
                     <img src={track.artwork_url || 'https://via.placeholder.com/100'} alt={track.title} className="w-16 h-16 rounded-full" />
                     <div className="flex-1">
                       <h2 className="text-blue-300 pixel-font text-sm">{track.title}</h2>
-                      <audio controls src={`${track.stream_url}?client_id=${CLIENT_ID}`} className="w-full mt-2" />
+                      <audio controls src={`${track.stream_url}?client_id=${process.env.NEXT_PUBLIC_SOUNDCLOUD_CLIENT_ID}`} className="w-full mt-2" />
                     </div>
                   </div>
                 </div>
