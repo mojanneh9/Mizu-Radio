@@ -1,54 +1,56 @@
-export default async function handler(req, res) {
-    const { SC_CLIENT_ID, SC_CLIENT_SECRET } = process.env;
+let accessTokenCache = {
+    token: null,
+    expiresAt: null,
+  };
   
-    console.log('[ENV] SC_CLIENT_ID:', SC_CLIENT_ID ? '✅ Present' : '❌ Missing');
-    console.log('[ENV] SC_CLIENT_SECRET:', SC_CLIENT_SECRET ? '✅ Present' : '❌ Missing');
+  export default async function handler(req, res) {
+    const { SC_CLIENT_ID, SC_CLIENT_SECRET } = process.env;
   
     if (!SC_CLIENT_ID || !SC_CLIENT_SECRET) {
       return res.status(500).json({ error: 'Missing SoundCloud API credentials' });
     }
   
     try {
-      // 1. Get OAuth token
-      const tokenResponse = await fetch('https://api.soundcloud.com/oauth2/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_id: SC_CLIENT_ID,
-          client_secret: SC_CLIENT_SECRET,
-          grant_type: 'client_credentials',
-        }),
-      });
+      // ✅ Check if token is cached and still valid
+      const now = Date.now();
+      if (!accessTokenCache.token || accessTokenCache.expiresAt < now) {
+        const tokenRes = await fetch('https://api.soundcloud.com/oauth2/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            client_id: SC_CLIENT_ID,
+            client_secret: SC_CLIENT_SECRET,
+            grant_type: 'client_credentials',
+          }),
+        });
   
-      const tokenData = await tokenResponse.json();
-      const accessToken = tokenData.access_token;
+        const tokenData = await tokenRes.json();
   
-      if (!accessToken) {
-        console.error('❌ No access token:', tokenData);
-        return res.status(401).json({ error: 'Failed to authenticate with SoundCloud' });
+        if (!tokenData.access_token) {
+          console.error('❌ No access token:', tokenData);
+          return res.status(429).json({ error: 'Rate limited by SoundCloud' });
+        }
+  
+        accessTokenCache.token = tokenData.access_token;
+        accessTokenCache.expiresAt = now + tokenData.expires_in * 1000;
       }
   
-      // ✅ Use hardcoded user ID
+      const accessToken = accessTokenCache.token;
       const userId = '52603176';
   
-      // 2. Fetch tracks directly
-      const tracksRes = await fetch(
-        `https://api.soundcloud.com/users/${userId}/tracks`,
-        {
-          headers: {
-            Authorization: `OAuth ${accessToken}`,
-          },
-        }
-      );
+      const tracksRes = await fetch(`https://api.soundcloud.com/users/${userId}/tracks`, {
+        headers: {
+          Authorization: `OAuth ${accessToken}`,
+        },
+      });
   
       const tracks = await tracksRes.json();
   
       if (!Array.isArray(tracks)) {
-        console.error('❌ Unexpected response from track API:', tracks);
-        return res.status(500).json({ error: 'Unexpected track data format from SoundCloud' });
+        console.error('❌ Unexpected tracks format:', tracks);
+        return res.status(500).json({ error: 'Invalid track data from SoundCloud' });
       }
   
-      // 3. Return simplified tracks
       const simplified = tracks.map((track) => ({
         id: track.id,
         title: track.title,
@@ -58,7 +60,7 @@ export default async function handler(req, res) {
   
       return res.status(200).json(simplified);
     } catch (err) {
-      console.error('❌ SoundCloud API error:', err);
-      return res.status(500).json({ error: 'Server error while accessing SoundCloud API' });
+      console.error('❌ API error:', err);
+      return res.status(500).json({ error: 'Server error fetching SoundCloud tracks' });
     }
   }
